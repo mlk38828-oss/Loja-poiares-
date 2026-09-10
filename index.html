@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loja Poiares</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><b>Loja <span>Poiares</span></b><nav><a href="#inicio">Início</a><a href="#produtos">Produtos</a><a href="#parceiros">Parceiros</a></nav><button onclick="abrirCarrinho()">🛒 <i id="qtd">0</i></button></header>
+<main>
+<section class="hero" id="inicio"><p>OFERTAS ONLINE</p><h1>Bem-vindo à <strong>Loja Poiares</strong></h1><p>Produtos de parceiros em um só lugar.</p><a href="#produtos">Ver produtos</a></section>
+<section id="produtos"><div class="top"><h2>Produtos em destaque</h2><input id="busca" placeholder="🔎 Procurar..." oninput="mostrar()"></div><div id="lista" class="grid"></div></section>
+<section id="parceiros" class="partner"><h2>Venda com a Loja Poiares</h2><p>Seja parceiro e apresente seus produtos.</p><button onclick="alert('Área de parceiros: demonstração')">Quero ser parceiro</button></section>
+</main>
+<div id="modal" class="modal"><div class="box"><button onclick="fecharCarrinho()">×</button><h2>Carrinho</h2><div id="itens"></div><h3>Total: <span id="total">R$ 0,00</span></h3><button class="final" onclick="finalizar()">Finalizar pedido</button></div></div>
+<footer>© 2026 Loja Poiares</footer>
+<script src="script.js"></script>
+</body>
+</html>
