@@ -3,18 +3,219 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Loja Poiares</title>
-<link rel="stylesheet" href="style.css">
+<title>Loja Poiares 2.0</title>
+<meta name="description" content="Loja Poiares — produtos, ofertas, carrinho e checkout.">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--yellow:#ffd21c;--yellow2:#ffb800;--black:#111;--bg:#f5f6f8;--white:#fff;--text:#202124;--muted:#69707a;--line:#e6e8eb;--green:#16a34a;--red:#dc2626}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}
+.top{background:#0d0d0d;color:#fff;text-align:center;padding:8px;font-size:13px}
+header{background:var(--black);color:#fff;position:sticky;top:0;z-index:30;box-shadow:0 2px 12px #0003}
+.nav{max-width:1250px;margin:auto;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:22px;white-space:nowrap}.logo span{background:var(--yellow);color:#111;padding:7px 9px;border-radius:10px}
+.search{flex:1;display:flex;background:#fff;border-radius:8px;overflow:hidden}.search input{width:100%;border:0;outline:0;padding:13px}.search button{background:var(--yellow);padding:0 18px;font-weight:800}
+.navbtn{background:#222;color:#fff;border:1px solid #444;padding:10px 12px;border-radius:8px}.navbtn:hover{background:#333}
+.badge{background:var(--yellow);color:#111;border-radius:20px;padding:2px 7px;font-size:11px;font-weight:900}
+main{max-width:1250px;margin:auto;padding:18px}
+.hero{background:linear-gradient(110deg,#111,#282828);color:#fff;border-radius:18px;padding:35px;display:flex;justify-content:space-between;align-items:center;min-height:250px;overflow:hidden}
+.hero h1{font-size:clamp(28px,5vw,52px);margin:0 0 10px}.hero p{color:#ddd;max-width:600px}.cta{background:var(--yellow);padding:13px 20px;border-radius:9px;font-weight:900}
+.hero-art{font-size:110px}
+.section{margin-top:28px}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px}.section h2{margin:0 0 15px}
+.categories{display:flex;gap:10px;overflow:auto;padding-bottom:5px}.cat{background:#fff;border:1px solid var(--line);padding:11px 16px;border-radius:30px;white-space:nowrap}.cat.active,.cat:hover{background:var(--yellow);border-color:var(--yellow)}
+.tools{display:flex;gap:8px;flex-wrap:wrap}.tools select,.tools input{padding:10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.card{background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--line);position:relative;transition:.2s}.card:hover{transform:translateY(-3px);box-shadow:0 8px 25px #0001}
+.pic{height:205px;background:#f2f3f5;display:flex;align-items:center;justify-content:center;font-size:75px;overflow:hidden}.pic img{width:100%;height:100%;object-fit:cover}
+.cardbody{padding:13px}.tag{display:inline-block;background:#eaf8ee;color:var(--green);padding:4px 7px;border-radius:6px;font-size:11px;font-weight:800}.card h3{font-size:16px;margin:9px 0}.price{font-size:22px;font-weight:900}.old{text-decoration:line-through;color:#999;font-size:12px;margin-left:5px}.install{color:var(--green);font-size:12px;margin-top:4px}.cardfoot{display:flex;gap:8px;margin-top:12px}.buy{flex:1;background:var(--yellow);padding:10px;border-radius:8px;font-weight:900}.heart{background:#f0f1f3;border-radius:8px;width:42px;font-size:19px}.heart.on{color:#e11}
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.trust div{background:#fff;border:1px solid var(--line);padding:16px;border-radius:12px}.trust b{display:block;margin-bottom:4px}
+.banner{background:var(--yellow);border-radius:15px;padding:22px;display:flex;justify-content:space-between;align-items:center}
+footer{background:#111;color:#fff;margin-top:40px}.footerin{max-width:1250px;margin:auto;padding:30px 18px;display:grid;grid-template-columns:2fr 1fr 1fr;gap:20px}.footerin p{color:#bbb}
+.overlay{display:none;position:fixed;inset:0;background:#0008;z-index:50;align-items:flex-end;justify-content:center}.overlay.open{display:flex}.modal{background:#fff;width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:20px}.modal.wide{width:min(1000px,100%)}.close{float:right;background:#eee;border-radius:50%;width:34px;height:34px}
+.row{display:flex;gap:10px}.row>*{flex:1}.form{display:grid;gap:10px}.form input,.form select,.form textarea{padding:12px;border:1px solid #ddd;border-radius:8px;width:100%}.primary{background:var(--yellow);padding:12px 18px;border-radius:8px;font-weight:900}.dark{background:#111;color:#fff;padding:12px 18px;border-radius:8px;font-weight:900}.danger{color:var(--red)}
+.cartitem{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center}.cartitem .emoji{font-size:38px;width:55px;text-align:center}.qty{display:flex;gap:7px;align-items:center}.qty button{background:#eee;border-radius:6px;width:28px;height:28px}
+.toast{position:fixed;right:18px;bottom:18px;background:#111;color:#fff;padding:12px 16px;border-radius:9px;z-index:100;display:none}.toast.show{display:block}
+.mobilebar{display:none}
+@media(max-width:900px){.grid{grid-template-columns:repeat(3,1fr)}.trust{grid-template-columns:repeat(2,1fr)}.hero-art{font-size:70px}}
+@media(max-width:650px){.nav{flex-wrap:wrap}.logo{font-size:18px}.search{order:3;flex-basis:100%}.navbtn{padding:9px}.hero{padding:25px}.hero-art{display:none}.grid{grid-template-columns:repeat(2,1fr);gap:10px}.pic{height:160px}.trust{grid-template-columns:1fr 1fr}.footerin{grid-template-columns:1fr}.tools{width:100%}.tools>*{flex:1;min-width:120px}.mobilebar{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #ddd;z-index:40;justify-content:space-around;padding:8px}.mobilebar button{background:none;font-size:11px}.mobilebar b{display:block;font-size:18px}main{padding-bottom:75px}}
+</style>
 </head>
 <body>
-<header><b>Loja <span>Poiares</span></b><nav><a href="#inicio">Início</a><a href="#produtos">Produtos</a><a href="#parceiros">Parceiros</a></nav><button onclick="abrirCarrinho()">🛒 <i id="qtd">0</i></button></header>
+<div class="top">🚚 Frete calculado pelo CEP • 🔒 Compra segura • 💬 Atendimento pelo WhatsApp</div>
+<header><div class="nav">
+  <div class="logo"><span>LP</span> Loja Poiares</div>
+  <div class="search"><input id="search" placeholder="Buscar produtos, marcas e categorias..." oninput="render()"><button onclick="render()">🔎</button></div>
+  <button class="navbtn" onclick="openAccount()">👤 <span id="accountText">Entrar</span></button>
+  <button class="navbtn" onclick="openCart()">🛒 <span class="badge" id="cartCount">0</span></button>
+</div></header>
+
 <main>
-<section class="hero" id="inicio"><p>OFERTAS ONLINE</p><h1>Bem-vindo à <strong>Loja Poiares</strong></h1><p>Produtos de parceiros em um só lugar.</p><a href="#produtos">Ver produtos</a></section>
-<section id="produtos"><div class="top"><h2>Produtos em destaque</h2><input id="busca" placeholder="🔎 Procurar..." oninput="mostrar()"></div><div id="lista" class="grid"></div></section>
-<section id="parceiros" class="partner"><h2>Venda com a Loja Poiares</h2><p>Seja parceiro e apresente seus produtos.</p><button onclick="alert('Área de parceiros: demonstração')">Quero ser parceiro</button></section>
+<section class="hero">
+ <div><h1>Ofertas que valem a pena.</h1><p>Encontre produtos, compare preços e compre com praticidade na Loja Poiares.</p><button class="cta" onclick="document.getElementById('produtos').scrollIntoView()">Ver ofertas</button></div>
+ <div class="hero-art">🛍️</div>
+</section>
+
+<section class="section"><div class="trust">
+ <div>🔒 <b>Compra segura</b><small>Checkout preparado para pagamento online.</small></div>
+ <div>🚚 <b>Frete por CEP</b><small>Consulte as opções antes de pagar.</small></div>
+ <div>💬 <b>Atendimento</b><small>Fale conosco pelo WhatsApp.</small></div>
+ <div>↩️ <b>Suporte</b><small>Atendimento para seus pedidos.</small></div>
+</div></section>
+
+<section class="section"><h2>Categorias</h2><div class="categories" id="cats"></div></section>
+
+<section class="section" id="produtos">
+ <div class="sectionhead"><h2>Produtos</h2><div class="tools"><select id="sort" onchange="render()"><option value="relevance">Mais relevantes</option><option value="priceAsc">Menor preço</option><option value="priceDesc">Maior preço</option><option value="name">Nome</option></select></div></div>
+ <div class="grid" id="grid"></div>
+</section>
+
+<section class="section"><div class="banner"><div><h2>📦 Quer comprar vários?</h2><p>Adicione os produtos ao carrinho e veja o frete no checkout.</p></div><button class="dark" onclick="openCart()">Abrir carrinho</button></div></section>
 </main>
-<div id="modal" class="modal"><div class="box"><button onclick="fecharCarrinho()">×</button><h2>Carrinho</h2><div id="itens"></div><h3>Total: <span id="total">R$ 0,00</span></h3><button class="final" onclick="finalizar()">Finalizar pedido</button></div></div>
-<footer>© 2026 Loja Poiares</footer>
-<script src="script.js"></script>
+
+<footer><div class="footerin"><div><h2>Loja Poiares</h2><p>Uma experiência de compra moderna, simples e segura.</p><p>WhatsApp: (91) 99358-9915</p></div><div><b>Atendimento</b><p>Segunda a sábado<br>WhatsApp e suporte online</p></div><div><b>Pagamento</b><p>Pix • Cartão • Boleto<br>Processamento pelo provedor de pagamento.</p></div></div></footer>
+
+<div class="mobilebar">
+ <button onclick="scrollTo(0,0)"><b>⌂</b>Início</button><button onclick="document.getElementById('produtos').scrollIntoView()"><b>▦</b>Produtos</button><button onclick="openAccount()"><b>♙</b>Conta</button><button onclick="openCart()"><b>🛒</b>Carrinho</button>
+</div>
+
+<div class="overlay" id="cartModal"><div class="modal"><button class="close" onclick="closeModal('cartModal')">×</button><h2>Seu carrinho</h2><div id="cartList"></div><hr><div class="row"><b>Total</b><strong id="cartTotal">R$ 0,00</strong></div><br><button class="primary" style="width:100%" onclick="openCheckout()">Continuar para checkout</button></div></div>
+
+<div class="overlay" id="accountModal"><div class="modal"><button class="close" onclick="closeModal('accountModal')">×</button><div id="accountBox"></div></div></div>
+
+<div class="overlay" id="productModal"><div class="modal wide"><button class="close" onclick="closeModal('productModal')">×</button><div id="productBox"></div></div></div>
+
+<div class="overlay" id="checkoutModal"><div class="modal"><button class="close" onclick="closeModal('checkoutModal')">×</button><h2>Finalizar compra</h2><div id="checkoutBox"></div></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================
+   CONFIGURAÇÃO
+   ========================= */
+const SUPABASE_URL = "COLE_AQUI_A_URL_DO_SEU_PROJETO";
+const SUPABASE_ANON_KEY = "COLE_AQUI_A_CHAVE_ANON_OU_PUBLISHABLE";
+const WHATSAPP = "5591993589915";
+const ORIGIN_CEP = "68700000";
+const CHECKOUT_FUNCTION = "criar-checkout";
+
+let sb = null;
+if(!SUPABASE_URL.startsWith("COLE_") && !SUPABASE_ANON_KEY.startsWith("COLE_")){
+  sb = supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+}
+
+const demoProducts=[
+ {id:"d1",nome:"Fone Bluetooth",preco:89.90,categoria:"Eletrônicos",emoji:"🎧",estoque:15,descricao:"Fone Bluetooth compacto para música e chamadas.",destaque:true},
+ {id:"d2",nome:"Smartwatch",preco:149.90,categoria:"Eletrônicos",emoji:"⌚",estoque:10,descricao:"Relógio inteligente para o dia a dia.",destaque:true},
+ {id:"d3",nome:"Mochila",preco:119.90,categoria:"Moda",emoji:"🎒",estoque:12,descricao:"Mochila prática para trabalho, escola e viagens."},
+ {id:"d4",nome:"Camiseta",preco:59.90,categoria:"Moda",emoji:"👕",estoque:30,descricao:"Camiseta confortável para uso diário."},
+ {id:"d5",nome:"Tênis esportivo",preco:179.90,categoria:"Calçados",emoji:"👟",estoque:8,descricao:"Tênis leve para atividades e caminhada."},
+ {id:"d6",nome:"Caixa de som",preco:129.90,categoria:"Eletrônicos",emoji:"🔊",estoque:9,descricao:"Caixa de som portátil para seus momentos de lazer."}
+];
+let products=[...demoProducts],cart=JSON.parse(localStorage.getItem("poiares_cart")||"[]"),favorites=JSON.parse(localStorage.getItem("poiares_fav")||"[]"),category="Todos",currentUser=null;
+
+const money=n=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+function toast(t){let e=document.getElementById("toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),2200)}
+function save(){localStorage.setItem("poiares_cart",JSON.stringify(cart));localStorage.setItem("poiares_fav",JSON.stringify(favorites));updateCart()}
+function updateCart(){document.getElementById("cartCount").textContent=cart.reduce((a,i)=>a+i.q,0)}
+function closeModal(id){document.getElementById(id).classList.remove("open")}
+function openModal(id){document.getElementById(id).classList.add("open")}
+
+async function loadProducts(){
+ if(sb){
+   const {data,error}=await sb.from("produto").select("*").order("id",{ascending:false});
+   if(!error && data?.length) products=data.map(p=>({...p,nome:p.nome||p.name,preco:Number(p.preco??p.price??0),categoria:p.categoria||"Outros",emoji:p.emoji||"📦",estoque:Number(p.estoque??p.stock??0),descricao:p.descricao||""}));
+ }
+ render();
+}
+
+function renderCats(){
+ const cats=["Todos",...new Set(products.map(p=>p.categoria).filter(Boolean))];
+ document.getElementById("cats").innerHTML=cats.map(c=>`<button class="cat ${c===category?"active":""}" onclick="category='${esc(c)}';render()">${esc(c)}</button>`).join("");
+}
+function render(){
+ renderCats();
+ let q=document.getElementById("search").value.toLowerCase().trim(),arr=products.filter(p=>(category==="Todos"||p.categoria===category)&&(!q||`${p.nome} ${p.categoria} ${p.descricao}`.toLowerCase().includes(q)));
+ let s=document.getElementById("sort").value;
+ if(s==="priceAsc")arr.sort((a,b)=>a.preco-b.preco);if(s==="priceDesc")arr.sort((a,b)=>b.preco-a.preco);if(s==="name")arr.sort((a,b)=>a.nome.localeCompare(b.nome));
+ document.getElementById("grid").innerHTML=arr.length?arr.map(card).join(""):`<div style="grid-column:1/-1;background:#fff;padding:30px;border-radius:12px;text-align:center">Nenhum produto encontrado.</div>`;
+ updateCart();
+}
+function card(p){
+ let fav=favorites.includes(String(p.id));
+ return `<article class="card"><div class="pic">${p.imagem_url?`<img src="${esc(p.imagem_url)}" alt="${esc(p.nome)}">`:esc(p.emoji||"📦")}</div><div class="cardbody"><span class="tag">${p.estoque>0?"Em estoque":"Esgotado"}</span><h3>${esc(p.nome)}</h3><div class="price">${money(p.preco)}</div><div class="install">Pagamento online disponível</div><div class="cardfoot"><button class="buy" ${p.estoque<=0?"disabled":""} onclick="addCart('${esc(p.id)}')">${p.estoque>0?"Adicionar":"Esgotado"}</button><button class="heart ${fav?"on":""}" onclick="toggleFav('${esc(p.id)}')">♥</button></div><button style="background:none;padding:10px 0;color:#555" onclick="openProduct('${esc(p.id)}')">Ver detalhes →</button></div></article>`;
+}
+function findProduct(id){return products.find(p=>String(p.id)===String(id))}
+function addCart(id){let p=findProduct(id);if(!p)return;let i=cart.find(x=>String(x.id)===String(id));if(i){if(i.q<p.estoque)i.q++;else return toast("Limite de estoque atingido")}else cart.push({id:p.id,q:1});save();toast("Produto adicionado ao carrinho")}
+function toggleFav(id){let x=String(id);favorites.includes(x)?favorites=favorites.filter(i=>i!==x):favorites.push(x);save();render()}
+function openCart(){
+ document.getElementById("cartList").innerHTML=cart.length?cart.map(i=>{let p=findProduct(i.id);return p?`<div class="cartitem"><div class="emoji">${esc(p.emoji||"📦")}</div><div style="flex:1"><b>${esc(p.nome)}</b><div>${money(p.preco)}</div><div class="qty"><button onclick="changeQty('${esc(p.id)}',-1)">−</button>${i.q}<button onclick="changeQty('${esc(p.id)}',1)">+</button><button class="danger" onclick="removeCart('${esc(p.id)}')">Excluir</button></div></div><strong>${money(p.preco*i.q)}</strong></div>`:""}).join(""):`<p>Seu carrinho está vazio.</p>`;
+ document.getElementById("cartTotal").textContent=money(cart.reduce((a,i)=>{let p=findProduct(i.id);return a+(p?p.preco*i.q:0)},0));openModal("cartModal")
+}
+function changeQty(id,d){let i=cart.find(x=>String(x.id)===String(id));let p=findProduct(id);if(!i)return;i.q+=d;if(i.q<=0)cart=cart.filter(x=>x!==i);else if(p&&i.q>p.estoque)i.q=p.estoque;save();openCart()}
+function removeCart(id){cart=cart.filter(x=>String(x.id)!==String(id));save();openCart()}
+function openProduct(id){let p=findProduct(id);if(!p)return;document.getElementById("productBox").innerHTML=`<div class="row" style="align-items:center"><div class="pic" style="flex:0 0 42%;height:300px">${p.imagem_url?`<img src="${esc(p.imagem_url)}">`:esc(p.emoji||"📦")}</div><div><span class="tag">${p.estoque>0?"Em estoque":"Esgotado"}</span><h1>${esc(p.nome)}</h1><p>${esc(p.descricao||"Produto da Loja Poiares.")}</p><div class="price">${money(p.preco)}</div><p class="install">Consulte frete pelo CEP no checkout.</p><button class="primary" onclick="addCart('${esc(p.id)}');closeModal('productModal')">Adicionar ao carrinho</button></div></div>`;openModal("productModal")}
+
+function openAccount(){
+ if(currentUser){showAccountLogged();return}
+ document.getElementById("accountBox").innerHTML=`<h2>Minha conta</h2><p>Entre ou crie sua conta para acompanhar pedidos e usar recursos da loja.</p><div class="form"><input id="email" type="email" placeholder="Seu e-mail"><input id="pass" type="password" placeholder="Senha"><button class="primary" onclick="login()">Entrar</button><button class="dark" onclick="signup()">Criar conta</button><button style="background:none" onclick="recover()">Esqueci minha senha</button></div><p id="authMsg"></p>`;
+ openModal("accountModal");
+}
+async function login(){if(!sb)return toast("Configure o Supabase no index.html primeiro");let {data,error}=await sb.auth.signInWithPassword({email:email.value,password:pass.value});if(error)return authMsg.textContent=error.message;currentUser=data.user;closeModal("accountModal");document.getElementById("accountText").textContent="Minha conta";toast("Login realizado")}
+async function signup(){if(!sb)return toast("Configure o Supabase no index.html primeiro");let {error}=await sb.auth.signUp({email:email.value,password:pass.value});authMsg.textContent=error?error.message:"Conta criada. Verifique seu e-mail se o projeto exigir confirmação."}
+async function recover(){if(!sb)return toast("Configure o Supabase no index.html primeiro");let {error}=await sb.auth.resetPasswordForEmail(email.value,{redirectTo:location.origin});authMsg.textContent=error?error.message:"Se o e-mail existir, enviaremos as instruções."}
+function showAccountLogged(){document.getElementById("accountBox").innerHTML=`<h2>Olá! 👋</h2><p>${esc(currentUser.email)}</p><button class="primary" onclick="openOrders()">Meus pedidos</button> <button class="dark" onclick="logout()">Sair</button>`;openModal("accountModal")}
+async function logout(){if(sb)await sb.auth.signOut();currentUser=null;document.getElementById("accountText").textContent="Entrar";closeModal("accountModal");toast("Você saiu da conta")}
+async function openOrders(){
+ if(!sb||!currentUser)return toast("Entre na sua conta primeiro");
+ let {data,error}=await sb.from("pedidos").select("*").eq("user_id",currentUser.id).order("created_at",{ascending:false});
+ document.getElementById("accountBox").innerHTML=`<h2>Meus pedidos</h2>${error?"<p>Não foi possível carregar os pedidos.</p>":data?.length?data.map(o=>`<div style="border:1px solid #ddd;border-radius:10px;padding:12px;margin:8px 0"><b>Pedido ${esc(o.id)}</b><br>Status: ${esc(o.status||"pendente")}<br>Total: ${money(o.total||0)}</div>`).join(""):"<p>Você ainda não possui pedidos.</p>"}`;
+}
+async function openCheckout(){
+ if(!cart.length)return toast("Carrinho vazio");
+ closeModal("cartModal");
+ document.getElementById("checkoutBox").innerHTML=`<div class="form">
+ <input id="cname" placeholder="Nome completo">
+ <input id="cemail" type="email" value="${esc(currentUser?.email||"")}" placeholder="E-mail">
+ <div class="row"><input id="cep" maxlength="9" placeholder="CEP" onblur="lookupCEP()"><input id="state" placeholder="UF"><input id="city" placeholder="Cidade"></div>
+ <div class="row"><input id="street" placeholder="Endereço"><input id="number" placeholder="Número"></div>
+ <input id="neighborhood" placeholder="Bairro"><input id="complement" placeholder="Complemento">
+ <select id="payment"><option value="pix">Pix</option><option value="credit_card">Cartão de crédito</option><option value="debit_card">Cartão de débito</option><option value="boleto">Boleto</option></select>
+ <button class="primary" onclick="createOnlineCheckout()">Pagar online</button>
+ <button class="dark" onclick="whatsappCheckout()">Finalizar pelo WhatsApp</button>
+ <small>O pagamento online será processado pelo provedor configurado no Supabase. Não coloque sua chave secreta neste arquivo.</small>
+ <div id="ship"></div></div>`;
+ openModal("checkoutModal");
+}
+async function lookupCEP(){
+ let c=cep.value.replace(/\D/g,"");if(c.length!==8)return;
+ try{let r=await fetch("https://viacep.com.br/ws/"+c+"/json/");let d=await r.json();if(d.erro)return;street.value=d.logradouro||"";neighborhood.value=d.bairro||"";city.value=d.localidade||"";state.value=d.uf||""}catch(e){}
+}
+function orderPayload(){
+ return {customer:{name:cname.value,email:cemail.value},address:{cep:cep.value,state:state.value,city:city.value,street:street.value,number:number.value,neighborhood:neighborhood.value,complement:complement.value},payment:payment.value,items:cart.map(i=>{let p=findProduct(i.id);return {id:p.id,name:p.nome,price:p.preco,quantity:i.q}}),origin_cep:ORIGIN_CEP};
+}
+async function createOnlineCheckout(){
+ if(!SUPABASE_URL||SUPABASE_URL.startsWith("COLE_"))return toast("Configure o Supabase antes do pagamento online");
+ if(!sb)return toast("Configure URL e chave pública do Supabase");
+ let payload=orderPayload();let {data,error}=await sb.functions.invoke(CHECKOUT_FUNCTION,{body:{action:"create_payment",...payload}});
+ if(error)return toast("Não foi possível iniciar o pagamento");
+ if(data?.checkout_url){location.href=data.checkout_url;return}
+ if(data?.qr_code){document.getElementById("ship").innerHTML=`<h3>Pix</h3><textarea readonly style="width:100%;height:100px">${esc(data.qr_code)}</textarea><p>Use o código Pix no aplicativo do seu banco.</p>`;return}
+ toast("Resposta de pagamento incompleta")
+}
+function whatsappCheckout(){
+ let p=orderPayload(),total=p.items.reduce((a,i)=>a+i.price*i.quantity,0);
+ let text=`Olá! Quero fazer um pedido na Loja Poiares.%0A%0A*Cliente:* ${encodeURIComponent(p.customer.name)}%0A*E-mail:* ${encodeURIComponent(p.customer.email)}%0A%0A*Produtos:*%0A${p.items.map(i=>encodeURIComponent(`${i.name} x${i.quantity} — ${money(i.price*i.quantity)}`)).join("%0A")}%0A%0A*Total dos produtos:* ${encodeURIComponent(money(total))}%0A%0A*Endereço:* ${encodeURIComponent(`${p.address.street}, ${p.address.number}, ${p.address.neighborhood}, ${p.address.city}-${p.address.state}, CEP ${p.address.cep}`)}%0A*Pagamento:* ${encodeURIComponent(p.payment)}`;
+ window.open(`https://wa.me/${WHATSAPP}?text=${text}`,"_blank");
+}
+async function boot(){
+ if(sb){
+   const {data}=await sb.auth.getSession();currentUser=data.session?.user||null;
+   if(currentUser)document.getElementById("accountText").textContent="Minha conta";
+   sb.auth.onAuthStateChange((_e,s)=>{currentUser=s?.user||null;document.getElementById("accountText").textContent=currentUser?"Minha conta":"Entrar"});
+ }
+ await loadProducts();
+}
+boot();
+</script>
 </body>
 </html>
